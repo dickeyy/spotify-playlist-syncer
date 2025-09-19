@@ -28,9 +28,9 @@ export SPOTIFY_CLIENT_SECRET="your_client_secret_here"
 
 ### 3. Playlist Files
 
-Create two files in the same directory as the program:
+Create two files in the `data/` directory as the program:
 
-#### subplaylists.txt
+#### `data/subplaylists.txt`
 
 Contains the URLs of playlists you want to monitor, one per line:
 
@@ -40,7 +40,7 @@ https://open.spotify.com/playlist/37i9dQZF1DX4JAvHpjipBk
 https://open.spotify.com/playlist/37i9dQZF1DWZd79rJ6a7lp
 ```
 
-#### masterplaylist.txt
+#### `data/masterplaylist.txt`
 
 Contains exactly one URL - your master playlist:
 
