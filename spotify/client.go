@@ -64,8 +64,8 @@ func NewClient(clientID, clientSecret string) (*Client, error) {
 			return
 		}
 
-		// create authenticated client
-		httpClient := spotifyauth.New().Client(ctx, token)
+		// create authenticated client using the same authenticator so refresh uses correct client creds
+		httpClient := auth.Client(ctx, token)
 		client := spotify.New(httpClient)
 		clientChan <- client
 
