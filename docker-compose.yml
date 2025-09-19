@@ -1,0 +1,19 @@
+version: "3.8"
+
+# This docker-compose file loads environment variables from .env file
+# Make sure to create a .env file with your Spotify credentials:
+# SPOTIFY_CLIENT_ID=your_client_id
+# SPOTIFY_CLIENT_SECRET=your_client_secret
+# ENVIRONMENT=prod
+
+services:
+  spotify-syncer:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    command: ["./syncer"]

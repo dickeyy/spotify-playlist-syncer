@@ -19,7 +19,18 @@ Create a Spotify app at [Spotify Developer Dashboard](https://developer.spotify.
 
 ### 2. Environment Variables
 
-Set your Spotify credentials:
+Create a `.env` file in the project root with your Spotify credentials:
+
+```bash
+# Create .env file
+cat > .env << EOF
+SPOTIFY_CLIENT_ID=your_client_id_here
+SPOTIFY_CLIENT_SECRET=your_client_secret_here
+ENVIRONMENT=prod
+EOF
+```
+
+Or set environment variables directly:
 
 ```bash
 export SPOTIFY_CLIENT_ID="your_client_id_here"
@@ -58,10 +69,58 @@ The app will request the following permissions when you authenticate:
 
 ### 5. Build and Run
 
+#### Option 1: Local Build
+
 ```bash
 go build -o syncer
 ./syncer              # production mode (json logs)
 ./syncer --dev        # development mode (pretty logs)
+```
+
+#### Option 2: Docker
+
+```bash
+# Build the Docker image
+docker build -t spotify-playlist-syncer .
+
+# Create .env file with your credentials
+echo "SPOTIFY_CLIENT_ID=your_client_id" > .env
+echo "SPOTIFY_CLIENT_SECRET=your_client_secret" >> .env
+echo "ENVIRONMENT=prod" >> .env
+
+# Run the container (will automatically load .env file)
+docker run -p 8080:8080 \
+  --env-file .env \
+  -v $(pwd)/data:/app/data \
+  spotify-playlist-syncer
+
+# Or run with --dev flag
+docker run -p 8080:8080 \
+  --env-file .env \
+  -v $(pwd)/data:/app/data \
+  spotify-playlist-syncer --dev
+```
+
+#### Option 3: Docker Compose
+
+```bash
+# Create .env file with your credentials
+echo "SPOTIFY_CLIENT_ID=your_client_id" > .env
+echo "SPOTIFY_CLIENT_SECRET=your_client_secret" >> .env
+echo "ENVIRONMENT=prod" >> .env
+
+# Run with docker-compose
+docker-compose up -d
+
+# Or run in development mode
+echo "ENVIRONMENT=dev" >> .env
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the service
+docker-compose down
 ```
 
 ## First Run
@@ -111,7 +170,8 @@ spotify-playlist-syncer/
 
 ## Requirements
 
-- Go 1.19+
+- Go 1.19+ (for local development)
+- Docker (optional, for containerized deployment)
 - Spotify Premium account (for playlist modification)
 - Spotify Developer App credentials
 
@@ -122,3 +182,4 @@ spotify-playlist-syncer/
 - Make sure your Spotify app has the redirect URI set to `http://localhost:8080/callback`
 - The master playlist should be writable by your account
 - The program requires an internet connection for authentication and API calls
+- When running in Docker, the OAuth callback will work as long as port 8080 is properly exposed
