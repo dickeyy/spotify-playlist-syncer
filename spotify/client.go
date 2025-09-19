@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/zmb3/spotify/v2"
@@ -30,11 +31,15 @@ func generateRandomState() (string, error) {
 
 // NewClient creates a new Spotify client with user authentication
 func NewClient(clientID, clientSecret string) (*Client, error) {
+	callbackURL := os.Getenv("CALLBACK_URL")
+	if callbackURL == "" {
+		callbackURL = "http://localhost:8080/callback"
+	}
 	// create OAuth2 config
 	auth := spotifyauth.New(
 		spotifyauth.WithClientID(clientID),
 		spotifyauth.WithClientSecret(clientSecret),
-		spotifyauth.WithRedirectURL("http://localhost:8080/callback"),
+		spotifyauth.WithRedirectURL(callbackURL),
 		spotifyauth.WithScopes(spotifyauth.ScopePlaylistReadPrivate, spotifyauth.ScopePlaylistModifyPrivate, spotifyauth.ScopePlaylistModifyPublic))
 
 	state, err := generateRandomState()
