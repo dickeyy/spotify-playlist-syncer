@@ -1,0 +1,3 @@
+# Add your master playlist URL here (exactly one line)
+# Example:
+https://open.spotify.com/playlist/1Bxi8MJuX2PgkLcYDwcUGg

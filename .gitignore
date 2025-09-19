@@ -1,0 +1,6 @@
+.DS_Store
+.env
+
+build/
+data/subplaylists.txt
+data/masterplaylist.txt

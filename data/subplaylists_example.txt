@@ -1,0 +1,4 @@
+# Add your playlist URLs here, one per line
+# Example:
+https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd
+https://open.spotify.com/playlist/37i9dQZF1DX4JAvHpjipBk
