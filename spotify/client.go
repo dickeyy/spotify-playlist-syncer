@@ -10,6 +10,8 @@ import (
 	"os"
 	"strings"
 
+	"spotify-playlist-syncer/logging"
+
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 )
@@ -141,18 +143,69 @@ func (c *Client) GetPlaylistTracks(ctx context.Context, playlistID spotify.ID) (
 	return allTracks, nil
 }
 
-// AddTracksToPlaylist adds tracks to a playlist
+// CheckTracksInPlaylist checks which tracks are already in a playlist
+func (c *Client) CheckTracksInPlaylist(ctx context.Context, playlistID spotify.ID, trackIDs []spotify.ID) (map[spotify.ID]bool, error) {
+	// Get all tracks from the playlist
+	playlistItems, err := c.GetPlaylistTracks(ctx, playlistID)
+	if err != nil {
+		return nil, fmt.Errorf("getting playlist tracks: %w", err)
+	}
+
+	// Create a set of existing track IDs
+	existingTracks := make(map[spotify.ID]bool)
+	for _, item := range playlistItems {
+		if item.Track.Track != nil {
+			existingTracks[item.Track.Track.ID] = true
+		}
+	}
+
+	return existingTracks, nil
+}
+
+// AddTracksToPlaylist adds tracks to a playlist, filtering out duplicates
 func (c *Client) AddTracksToPlaylist(ctx context.Context, playlistID spotify.ID, trackIDs []spotify.ID) error {
+	if len(trackIDs) == 0 {
+		return nil
+	}
+
+	// Check which tracks are already in the playlist
+	existingTracks, err := c.CheckTracksInPlaylist(ctx, playlistID, trackIDs)
+	if err != nil {
+		return fmt.Errorf("checking existing tracks: %w", err)
+	}
+
+	// Filter out tracks that are already in the playlist
+	var tracksToAdd []spotify.ID
+	var duplicateCount int
+	for _, trackID := range trackIDs {
+		if !existingTracks[trackID] {
+			tracksToAdd = append(tracksToAdd, trackID)
+		} else {
+			duplicateCount++
+		}
+	}
+
+	// Log if we filtered out duplicates
+	if duplicateCount > 0 {
+		logging.Info("filtered duplicate tracks from master playlist", "count", duplicateCount)
+	}
+
+	// If no new tracks to add, return early
+	if len(tracksToAdd) == 0 {
+		logging.Info("no new tracks to add - all tracks already exist in master playlist")
+		return nil
+	}
+
 	// spotify api allows max 100 tracks per request
 	const batchSize = 100
 
-	for i := 0; i < len(trackIDs); i += batchSize {
+	for i := 0; i < len(tracksToAdd); i += batchSize {
 		end := i + batchSize
-		if end > len(trackIDs) {
-			end = len(trackIDs)
+		if end > len(tracksToAdd) {
+			end = len(tracksToAdd)
 		}
 
-		batch := trackIDs[i:end]
+		batch := tracksToAdd[i:end]
 		_, err := c.client.AddTracksToPlaylist(ctx, playlistID, batch...)
 		if err != nil {
 			return fmt.Errorf("adding tracks batch %d-%d: %w", i, end-1, err)

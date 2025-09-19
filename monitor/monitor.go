@@ -163,7 +163,7 @@ func (m *Monitor) scanPlaylist(ctx context.Context, playlistID spotifyapi.ID) er
 
 		logging.Info("added tracks to master playlist", "count", len(newTracks))
 	} else {
-		logging.Debug("no new tracks found", "playlistID", playlistID)
+		logging.Info("no new tracks found", "playlistID", playlistID)
 	}
 
 	return nil
