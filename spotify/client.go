@@ -55,7 +55,9 @@ func NewClient(clientID, clientSecret string) (*Client, error) {
 
 	// start local server to handle callback
 	http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.Token(r.Context(), state, r)
+		// use a background context so token source doesn't inherit request cancellation
+		ctx := context.Background()
+		token, err := auth.Token(ctx, state, r)
 		if err != nil {
 			errorChan <- fmt.Errorf("getting token: %w", err)
 			http.Error(w, "Authentication failed", http.StatusInternalServerError)
@@ -63,7 +65,7 @@ func NewClient(clientID, clientSecret string) (*Client, error) {
 		}
 
 		// create authenticated client
-		httpClient := spotifyauth.New().Client(r.Context(), token)
+		httpClient := spotifyauth.New().Client(ctx, token)
 		client := spotify.New(httpClient)
 		clientChan <- client
 
