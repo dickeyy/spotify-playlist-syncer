@@ -18,12 +18,12 @@ type Config struct {
 
 // Load reads configuration from files and environment
 func Load(dev bool) (*Config, error) {
-	interval := 5 * time.Minute // default 5 minutes
+	interval := 15 * time.Minute // default 15 minutes
 	if dev {
 		interval = 10 * time.Second
 	}
 	config := &Config{
-		CheckInterval: interval, // default 5 minutes
+		CheckInterval: interval, // default 15 minutes
 		DevMode:       dev,
 	}
 

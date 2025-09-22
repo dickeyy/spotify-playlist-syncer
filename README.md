@@ -139,7 +139,7 @@ When you start the program for the first time:
 
 - **Authentication**: Uses OAuth2 Authorization Code flow with user consent
 - **Initialization**: On startup, fetches all existing tracks from master and sub-playlists to establish baseline
-- **Monitoring**: The program scans all your sub-playlists every 5 minutes (or 30 seconds in dev mode)
+- **Monitoring**: The program scans all your sub-playlists every 15 minutes (or 30 seconds in dev mode)
 - **Syncing**: When it finds new songs in any sub-playlist, it adds them to your master playlist
 - **Deduplication**: Remembers all tracks seen during initialization and runtime to avoid duplicates
 - **Continuous**: Runs continuously until you stop it with Ctrl+C
@@ -148,7 +148,7 @@ When you start the program for the first time:
 
 ### Check Interval
 
-The default check interval is 5 minutes. In development mode (`--dev`), it's 30 seconds for faster testing. You can modify this in `config/config.go` if needed.
+The default check interval is 15 minutes. In development mode (`--dev`), it's 30 seconds for faster testing. You can modify this in `config/config.go` if needed.
 
 ### Logging
 
